@@ -331,13 +331,26 @@ function startClocks() {
 
 function buildTicker() {
   const track = document.getElementById("ticker-track");
+  const bar = track.parentElement;
   const items = GAMES.map(g => {
     const result = resolveResult(g);
     return result
       ? `${g.homeTeam.flag} ${g.homeTeam.name} ${result.home} × ${result.away} ${g.awayTeam.name} ${g.awayTeam.flag}`
       : `${g.homeTeam.flag} ${g.homeTeam.name} × ${g.awayTeam.name} ${g.awayTeam.flag} — ${formatDate(g.date)}`;
   });
-  const html = items.map(i => `<span class="ticker-item">${i}</span>`).join("  <span class='ticker-sep'>|</span>  ");
+  const buildPass = arr => arr.map(i => `<span class="ticker-item">${i}</span>`).join("  <span class='ticker-sep'>|</span>  ");
+
+  // Repete os jogos até que uma "passada" seja larga o suficiente para
+  // cobrir a barra inteira — com poucos jogos, sem isso o loop de
+  // rolagem deixava um vão vazio (ou quase parado) na tela.
+  let pass = items;
+  track.innerHTML = buildPass(pass);
+  while (track.getBoundingClientRect().width < bar.getBoundingClientRect().width && pass.length < items.length * 10) {
+    pass = pass.concat(items);
+    track.innerHTML = buildPass(pass);
+  }
+
+  const html = buildPass(pass);
   track.innerHTML = html + "  <span class='ticker-sep'>|</span>  " + html;
 }
 
