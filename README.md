@@ -95,9 +95,15 @@ encerradas" / "Bola rolando".
 
 ## Mudar o status e o placar pelo site, ao vivo, para TODOS (override do organizador)
 
-O status e o placar do jogo podem ser atualizados por uma única aba chamada
-**`Status`** na sua planilha — sem deploy, refletindo para todos os
+O status e o placar do **jogo ativo** podem ser atualizados por uma única aba
+chamada **`Status`** na sua planilha — sem deploy, refletindo para todos os
 participantes:
+
+> O "jogo ativo" é detectado automaticamente pelo site: é o jogo já iniciado
+> mais recentemente (data/hora de início já passou), ou — se nenhum jogo
+> começou ainda — o próximo da lista a começar. Os outros jogos **não** são
+> afetados pela aba `Status`: continuam com seu próprio placar ("`? × ?`"
+> até você preencher `result` no `data.js`) e seu próprio status automático.
 
 | Célula | Conteúdo | Efeito |
 |--------|----------|--------|
@@ -187,10 +193,10 @@ Pronto. A partir daí, os cliques no painel gravam na célula A1 da aba `Status`
 e os outros participantes veem a mudança no próximo carregamento (o site
 também re-busca automaticamente a cada **2 minutos**).
 
-> ⚠️ Esse override é **global** — vale para todos os jogos ao mesmo tempo. Com
-> 1 jogo ativo por vez (como agora) isso é exatamente o que se quer. Se no
-> futuro houver jogos simultâneos com status diferentes, esse mecanismo
-> precisaria evoluir para um override por jogo.
+> ⚠️ Esse override vale só para o **jogo ativo** (detectado automaticamente,
+> veja acima) — os demais jogos não são afetados. Se no futuro houver dois
+> jogos acontecendo ao mesmo tempo, esse mecanismo precisaria evoluir para
+> permitir overrides simultâneos para mais de um jogo.
 
 ---
 

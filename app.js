@@ -159,9 +159,31 @@ function autoStatus(game) {
   return game.status;
 }
 
-// Status efetivo do jogo: override global do organizador vence; senão, o tempo.
+// Jogo "ativo" para fins do override da aba Status: o jogo já iniciado mais
+// recentemente (kickoff <= agora) ou, se nenhum jogo começou ainda, o
+// próximo a começar. O status/placar da aba Status (e os botões do
+// organizador) valem só para esse jogo — assim a atualização de um jogo não
+// "vaza" para os cards de jogos futuros.
+function getActiveGame() {
+  const now = Date.now();
+  let started = null;
+  let next = null;
+  for (const g of GAMES) {
+    const kickoff = kickoffEpoch(g);
+    if (isNaN(kickoff)) continue;
+    if (kickoff <= now) {
+      if (!started || kickoff > kickoffEpoch(started)) started = g;
+    } else if (!next || kickoff < kickoffEpoch(next)) {
+      next = g;
+    }
+  }
+  return started || next || GAMES[0];
+}
+
+// Status efetivo do jogo: override global do organizador vence (só para o
+// jogo ativo); senão, o tempo.
 function resolveStatus(game) {
-  if (GLOBAL_STATUS_OVERRIDE) return GLOBAL_STATUS_OVERRIDE;
+  if (GLOBAL_STATUS_OVERRIDE && game.id === getActiveGame().id) return GLOBAL_STATUS_OVERRIDE;
   return autoStatus(game);
 }
 
@@ -189,9 +211,12 @@ function normalizeStatusValue(raw) {
 }
 
 // Placar efetivo do jogo: usa o "result" fixo do data.js se existir; senão,
-// cai no override lido das células C1/D1 da aba "Status" (ou null = pendente).
+// cai no override lido das células C1/D1 da aba "Status" — só para o jogo
+// ativo (os demais ficam com placar pendente "? × ?").
 function resolveResult(game) {
-  return game.result || GLOBAL_RESULT_OVERRIDE || null;
+  if (game.result) return game.result;
+  if (game.id === getActiveGame().id) return GLOBAL_RESULT_OVERRIDE;
+  return null;
 }
 
 function statusLabel(status) {

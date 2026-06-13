@@ -20,9 +20,15 @@ const ADMIN_EMAIL = "joaoaraujomn@gmail.com";
 // ------------------------------------------------------------------
 // OVERRIDE DE STATUS E PLACAR COMPARTILHADOS (sem deploy)
 //
-// O status e o placar do jogo ativo podem ser atualizados ao vivo — e a
+// O status e o placar do "jogo ativo" podem ser atualizados ao vivo — e a
 // mudança vale para TODOS os participantes — editando células da planilha,
 // sem mexer no código.
+//
+// O "jogo ativo" é detectado automaticamente: é o jogo já iniciado mais
+// recentemente (kickoff <= agora) ou, se nenhum jogo começou ainda, o
+// próximo da lista a começar. Os demais jogos NÃO são afetados por esse
+// override — continuam com seu próprio status/placar ("? × ?" até terem
+// um result no data.js).
 //
 // Como funciona:
 //   • LEITURA  → aba "Status" da planilha, publicada como CSV.
