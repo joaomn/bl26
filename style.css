@@ -527,6 +527,12 @@ html, body {
   .game-result { font-size: 1.8rem; }
   .team-flag { font-size: 2rem; }
   .user-badge { max-width: 130px; }
+
+  .header-logo { font-size: 1.25rem; letter-spacing: 1.5px; }
+  .header-flags { display: none; }
+  .game-card { padding: 18px; }
+  .bets-table { font-size: 0.76rem; }
+  .bets-table th, .bets-table td { padding: 7px 8px; }
 }
 
 /* Reduced motion */
