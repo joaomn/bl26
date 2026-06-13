@@ -295,6 +295,38 @@ html, body {
   flex: 1;
 }
 
+/* ---------- TOTAL ARRECADADO ---------- */
+
+.stats-box {
+  background: var(--blue-mid);
+  border: 1px solid rgba(245,197,24,0.25);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.stats-box:empty { display: none; }
+
+.stats-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  color: var(--yellow);
+}
+
+.stats-detail {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+}
+
+.stats-loading,
+.stats-error {
+  font-size: 0.9rem;
+  color: var(--gray-400);
+}
+
 /* ---------- FILTERS ---------- */
 
 .filter-section { margin-bottom: 28px; }
