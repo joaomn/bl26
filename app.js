@@ -7,6 +7,9 @@ const STORAGE_KEY = "bolao_user_email";
 const STORAGE_NAME = "bolao_user_name";
 const OVERRIDE_LOCAL_KEY = "bolao_status_override";
 
+// Valor (em reais) que cada participante deposita.
+const BET_VALUE_PER_PERSON = 20;
+
 // Usuário logado nesta sessão (preenchido em enterApp)
 let CURRENT_USER = null;
 
@@ -361,6 +364,45 @@ function buildFilters() {
   });
 }
 
+// ---------- TOTAL ARRECADADO ----------
+
+// Conta e-mails únicos na planilha de participantes e exibe o total
+// arrecadado (cada e-mail = 1 pessoa = R$ 20,00).
+async function buildStatsBox() {
+  const box = document.getElementById("stats-box");
+  if (!box) return;
+
+  box.innerHTML = `<div class="stats-loading">⏳ Calculando total arrecadado...</div>`;
+
+  try {
+    const text = await fetchCSV(PARTICIPANTS_CSV_URL);
+    const rows = parseCSV(text);
+
+    const emails = new Set();
+    rows.forEach(row => {
+      const email = (
+        row["Endereço de e-mail"] ||
+        row["Email"] ||
+        row["email"] ||
+        Object.values(row)[1] ||
+        ""
+      ).trim().toLowerCase();
+      if (email) emails.add(email);
+    });
+
+    const total = emails.size * BET_VALUE_PER_PERSON;
+    const perPerson = BET_VALUE_PER_PERSON.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+
+    box.innerHTML = `
+      <div class="stats-value">💰 R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
+      <div class="stats-detail">${emails.size} ${emails.size === 1 ? "participante" : "participantes"} · R$ ${perPerson} cada</div>
+    `;
+  } catch (err) {
+    box.innerHTML = `<div class="stats-error">⚠️ Não foi possível calcular o total arrecadado.</div>`;
+    console.error(err);
+  }
+}
+
 // ---------- BETS TABLE ----------
 
 // ---------- BUSCAR APOSTAS DO CSV ----------
@@ -710,6 +752,7 @@ async function enterApp(participant) {
   buildTicker();
   buildFilters();
   buildGames();
+  buildStatsBox();
   startClocks();
 
   // Carrega os overrides compartilhados e re-renderiza já com eles aplicados.
