@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolão Melo da Copa 🏆</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="copa-do-mundo.png" />
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="screen active">
+    <div class="login-bg">
+      <div class="field-lines"></div>
+    </div>
+    <div class="login-card">
+      <div class="trophy-icon">🏆</div>
+      <h1 class="logo-title">BOLÃO<span class="accent">.</span>Melo</h1>
+      <p class="login-subtitle">Acesso exclusivo para participantes</p>
+      <div class="input-group">
+        <label for="email-input">Seu e-mail de inscrição</label>
+        <input
+          type="email"
+          id="email-input"
+          placeholder="voce@gmail.com"
+          autocomplete="email"
+        />
+        <span class="input-error" id="email-error"></span>
+      </div>
+      <button class="btn-primary" id="login-btn">Entrar no Bolão</button>
+      <p class="login-hint">Não consegue acessar? Fale com o organizador.</p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-screen" class="screen">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-brand">
+          <span class="header-logo">🏆 🇧🇷🇧🇷🇧🇷 BOLÃO<span class="accent">.</span>Melo 🇧🇷🇧🇷🇧🇷</span>
+        </div>
+        <div class="header-right">
+          <span class="user-badge" id="user-badge">👤 —</span>
+          <button class="btn-logout" id="logout-btn">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- SCOREBOARD TICKER -->
+    <div class="ticker-bar">
+      <div class="ticker-track" id="ticker-track">
+        <!-- preenchido via JS -->
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- PAINEL DO ORGANIZADOR (override de status, só para o admin) -->
+      <section class="admin-panel" id="admin-panel"></section>
+
+      <!-- PHASE FILTER -->
+      <section class="filter-section">
+        <h2 class="section-title">Jogos</h2>
+        <div class="phase-filters" id="phase-filters">
+          <!-- botões de fase gerados via JS -->
+        </div>
+      </section>
+
+      <!-- GAMES GRID -->
+      <section class="games-section" id="games-section">
+        <!-- cards gerados via JS -->
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>Bolão organizado por <strong>João</strong> · Dúvidas? Chama no grupo 📲</p>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

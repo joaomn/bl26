@@ -1,0 +1,806 @@
+/* ============================================================
+   BOLÃO.CUP — Stylesheet
+   Tema: Estádio brasileiro, placar eletrônico, verde/amarelo/azul
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-deep:   #0A5C2E;
+  --green-mid:    #1A8A4A;
+  --green-light:  #25B45E;
+  --yellow:       #F5C518;
+  --yellow-dark:  #C9A000;
+  --blue-dark:    #0D1B2A;
+  --blue-mid:     #162840;
+  --blue-light:   #1E3A5F;
+  --white:        #F8F8F8;
+  --gray-100:     #E8EDF2;
+  --gray-400:     #8899AA;
+  --gray-600:     #4A5568;
+  --red:          #E53E3E;
+  --radius:       12px;
+  --radius-sm:    8px;
+  --shadow:       0 4px 24px rgba(0,0,0,0.18);
+  --shadow-lg:    0 8px 40px rgba(0,0,0,0.28);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: var(--blue-dark);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* ---------- SCREENS ---------- */
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ---------- LOGIN ---------- */
+
+#login-screen {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background: var(--blue-dark);
+  overflow: hidden;
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Campo de futebol estilizado como fundo */
+.field-lines {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(26,138,74,0.18) 0%, transparent 70%),
+    linear-gradient(180deg, transparent 49%, rgba(37,180,94,0.07) 49%, rgba(37,180,94,0.07) 51%, transparent 51%);
+}
+
+.field-lines::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(37,180,94,0.15);
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  background: var(--blue-mid);
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(37,180,94,0.08);
+  text-align: center;
+}
+
+.trophy-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 12px rgba(245,197,24,0.5));
+}
+
+.logo-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 4px;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.accent { color: var(--yellow); }
+
+.login-subtitle {
+  color: var(--gray-400);
+  font-size: 0.875rem;
+  margin-bottom: 32px;
+  letter-spacing: 0.5px;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.input-group input::placeholder { color: var(--gray-600); }
+.input-group input:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.15);
+}
+
+.input-error {
+  display: block;
+  min-height: 20px;
+  color: #fc8181;
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: var(--yellow);
+  color: var(--blue-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(245,197,24,0.3);
+}
+
+.btn-primary:hover {
+  background: var(--yellow-dark);
+  box-shadow: 0 6px 20px rgba(245,197,24,0.4);
+}
+
+.btn-primary:active { transform: scale(0.98); }
+
+.login-hint {
+  margin-top: 20px;
+  color: var(--gray-600);
+  font-size: 0.78rem;
+}
+
+/* Shake animation para email inválido */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+.input-shake { animation: shake 0.4s ease; }
+
+/* ---------- HEADER ---------- */
+
+.header {
+  background: var(--blue-mid);
+  border-bottom: 2px solid var(--green-deep);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  color: var(--white);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-badge {
+  background: rgba(37,180,94,0.12);
+  border: 1px solid rgba(37,180,94,0.3);
+  color: var(--green-light);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--gray-400);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-logout:hover {
+  border-color: var(--red);
+  color: #fc8181;
+}
+
+/* ---------- TICKER ---------- */
+
+.ticker-bar {
+  background: var(--green-deep);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(245,197,24,0.2);
+}
+
+.ticker-track {
+  display: inline-block;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-track:hover { animation-play-state: paused; }
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  color: var(--yellow);
+  padding: 0 24px;
+}
+
+.ticker-sep {
+  color: rgba(245,197,24,0.3);
+  padding: 0 8px;
+}
+
+/* ---------- MAIN ---------- */
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  flex: 1;
+}
+
+/* ---------- FILTERS ---------- */
+
+.filter-section { margin-bottom: 28px; }
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.phase-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: var(--gray-400);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: var(--green-light);
+  color: var(--green-light);
+}
+
+.filter-btn.active {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  color: var(--white);
+}
+
+/* ---------- GAMES GRID ---------- */
+
+.games-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.game-card {
+  background: var(--blue-mid);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border-color: rgba(37,180,94,0.3);
+}
+
+.game-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.game-phase-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+/* BADGES */
+.badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+
+.badge-open     { background: rgba(37,180,94,0.15); color: var(--green-light); border: 1px solid rgba(37,180,94,0.4); }
+.badge-closed   { background: rgba(245,197,24,0.1); color: var(--yellow); border: 1px solid rgba(245,197,24,0.3); }
+.badge-finished { background: rgba(100,100,120,0.2); color: var(--gray-400); border: 1px solid rgba(255,255,255,0.1); }
+.badge-upcoming { background: rgba(30,58,95,0.6);   color: #90CDF4; border: 1px solid rgba(144,205,244,0.3); }
+
+/* MATCHUP */
+.game-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.team-flag { font-size: 2.4rem; line-height: 1; }
+
+.team-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--white);
+  text-align: center;
+}
+
+.game-result {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  color: var(--yellow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+
+.game-result.pending { color: var(--gray-600); }
+
+.result-x {
+  font-size: 1.2rem;
+  color: var(--gray-600);
+}
+
+/* META */
+.game-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.game-prize {
+  font-size: 0.82rem;
+  color: var(--green-light);
+  background: rgba(37,180,94,0.08);
+  border: 1px solid rgba(37,180,94,0.15);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.game-deadline {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.game-deadline strong { color: var(--yellow); }
+
+/* ACTIONS */
+.game-actions { margin-top: auto; }
+
+.btn-sheet {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--green-mid);
+  color: var(--white);
+  transition: background 0.2s, transform 0.1s;
+  cursor: pointer;
+}
+
+.btn-sheet:hover { background: var(--green-light); transform: scale(1.01); }
+
+.btn-sheet.disabled {
+  background: rgba(255,255,255,0.05);
+  color: var(--gray-600);
+  cursor: default;
+  font-size: 0.8rem;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  color: var(--gray-600);
+  font-size: 1rem;
+}
+
+/* ---------- FOOTER ---------- */
+
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--gray-600);
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 600px) {
+  .login-card { padding: 36px 24px; margin: 16px; }
+  .logo-title { font-size: 2.4rem; }
+  .games-section { grid-template-columns: 1fr; }
+  .header-inner { padding: 12px 16px; }
+  .main { padding: 24px 16px; }
+  .game-result { font-size: 1.8rem; }
+  .team-flag { font-size: 2rem; }
+  .user-badge { max-width: 130px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---------- BETS TABLE ---------- */
+
+.bets-section {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 16px;
+}
+
+.bets-loading, .bets-empty, .bets-error {
+  text-align: center;
+  padding: 16px;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+}
+
+.bets-error { color: #fc8181; }
+
+.bets-summary {
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  background: rgba(245,197,24,0.08);
+  border: 1px solid rgba(245,197,24,0.2);
+  color: var(--yellow);
+}
+
+.bets-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.bets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.bets-table thead tr {
+  background: rgba(255,255,255,0.04);
+}
+
+.bets-table th {
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.bets-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--white);
+}
+
+.bets-table tbody tr:last-child td { border-bottom: none; }
+
+.bets-table tbody tr:hover td {
+  background: rgba(255,255,255,0.03);
+}
+
+.bet-name { font-weight: 500; }
+
+.bet-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  color: var(--yellow);
+}
+
+.bet-hit  { color: var(--green-light); font-weight: 600; font-size: 0.8rem; }
+.bet-miss { color: var(--gray-600); font-size: 0.8rem; }
+
+.bets-locked {
+  text-align: center;
+  padding: 14px;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ---------- BOTÃO VER GANHADORES ---------- */
+
+.btn-check-winners {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%);
+  color: var(--blue-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 3px 12px rgba(245,197,24,0.25);
+}
+
+.btn-check-winners:hover  { opacity: 0.9; transform: scale(1.01); }
+.btn-check-winners:active { transform: scale(0.98); }
+.btn-check-winners:disabled { opacity: 0.5; cursor: wait; }
+
+/* ---------- BOX DE RESULTADO DOS GANHADORES ---------- */
+
+.winners-result { margin-bottom: 12px; }
+
+.winners-box {
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.winners-box.has-winners {
+  background: rgba(37,180,94,0.1);
+  border: 1px solid rgba(37,180,94,0.35);
+}
+
+.winners-box.no-winners {
+  background: rgba(245,197,24,0.07);
+  border: 1px solid rgba(245,197,24,0.25);
+}
+
+.winners-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  color: var(--gray-400);
+}
+
+.winners-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+.winners-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.winner-name {
+  background: rgba(37,180,94,0.15);
+  border: 1px solid rgba(37,180,94,0.4);
+  color: var(--green-light);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.winners-box.no-winners .winners-names {
+  color: var(--yellow);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.winners-error {
+  color: #fc8181;
+  font-size: 0.82rem;
+  padding: 8px 0;
+}
+
+/* ---------- BETS SUMMARY VARIANTS ---------- */
+
+.bets-summary.has-winners {
+  background: rgba(37,180,94,0.1);
+  border-color: rgba(37,180,94,0.35);
+  color: var(--green-light);
+}
+
+.bets-summary.no-winners {
+  background: rgba(245,197,24,0.07);
+  border-color: rgba(245,197,24,0.25);
+  color: var(--yellow);
+}
+
+/* ---------- CRONÔMETROS REGRESSIVOS ---------- */
+
+.game-countdowns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(13,27,42,0.55);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.countdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.countdown-label {
+  font-size: 0.78rem;
+  color: var(--gray-400);
+}
+
+.countdown {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  color: var(--green-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.countdown.countdown-done {
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--yellow);
+}
+
+/* ---------- PAINEL DO ORGANIZADOR (override global de status) ---------- */
+
+.admin-panel:empty { display: none; }
+
+.admin-panel-inner {
+  background: var(--blue-mid);
+  border: 1px solid rgba(245,197,24,0.25);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.admin-status-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-status-btn {
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: var(--gray-400);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-status-btn:hover {
+  border-color: var(--green-light);
+  color: var(--green-light);
+}
+
+.admin-status-btn.active {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  color: var(--white);
+}
