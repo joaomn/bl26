@@ -106,7 +106,7 @@ const GAMES = [
     date: "2026-06-19",
     time: "21:30",
     venue: "Estádio da Filadélfia, Filadélfia",
-    status: "closed",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "",
     betDeadline: "2026-06-19T21:29:00",  // horário de Recife
@@ -121,7 +121,7 @@ const GAMES = [
     date: "2026-06-24",
     time: "19:00",
     venue: "Estádio da Miami, Miami Gardens",
-    status: "closed",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "",
     betDeadline: "2026-06-24T18:59:00",  // horário de Recife
