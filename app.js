@@ -727,9 +727,9 @@ function updateAdminPanel(isAdmin) {
 
 // ---------- LOGIN ----------
 
-// Só aceita e-mails terminados em @gmail.com (evita números soltos, "asd",
+// Aceita qualquer e-mail com formato válido (evita números soltos, "asd",
 // "teste123" etc. sendo digitados no campo de login).
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i;
 
 function setLoginLoading(loading) {
   const btn = document.getElementById("login-btn");
@@ -751,7 +751,7 @@ async function doLogin() {
   }
 
   if (!EMAIL_REGEX.test(email)) {
-    error.textContent = "Digite um e-mail válido do Gmail (ex: nome@gmail.com).";
+    error.textContent = "Digite um e-mail válido (ex: nome@exemplo.com).";
     input.classList.add("input-shake");
     setTimeout(() => input.classList.remove("input-shake"), 500);
     input.focus();
