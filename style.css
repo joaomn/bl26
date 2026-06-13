@@ -35,7 +35,7 @@ html, body {
 
 /* ---------- SCREENS ---------- */
 
-.screen { display: none; min-height: 100vh; }
+.screen { display: none; min-height: 100vh; min-height: 100dvh; }
 .screen.active { display: flex; flex-direction: column; }
 
 /* ---------- LOGIN ---------- */
@@ -315,6 +315,9 @@ html, body {
 
 .filter-btn {
   padding: 8px 20px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 99px;
   border: 1.5px solid rgba(255,255,255,0.12);
   background: transparent;
@@ -802,6 +805,9 @@ html, body {
 
 .admin-status-btn {
   padding: 5px 11px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 99px;
   border: 1px solid rgba(255,255,255,0.15);
   background: transparent;
