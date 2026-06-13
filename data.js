@@ -106,6 +106,21 @@ const GAMES = [
     betDeadline: "2026-06-19T21:29:00",  // horário de Recife
     finishAt: "2026-06-19T21:30:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
+  },{
+    id: "jogo3",
+    phase: "Fase de Grupos",
+    phaseTag: "grupos",
+    homeTeam: { name: "Brasil",   flag: "🇧🇷" },
+    awayTeam: { name: "Escócia", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+    date: "2026-06-24",
+    time: "19:00",
+    venue: "Estádio da Miami, Miami Gardens",
+    status: "close",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    result: null,             // { home: 2, away: 1 } quando terminar
+    csvUrl: "",
+    betDeadline: "2026-06-24T18:59:00",  // horário de Recife
+    finishAt: "2026-06-24T19:00:00",     // horário de Recife: vira "finished" às 19h
+    prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
   },
 
   // ------------------------------------------------------------------
