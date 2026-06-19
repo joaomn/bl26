@@ -1,0 +1,40 @@
+#!/bin/sh
+# ============================================================
+#  PRE-COMMIT — Auto-bump do CACHE_VERSION do Service Worker
+#
+#  Gera um hash do conteúdo dos arquivos do app e grava em sw.js.
+#  Assim, qualquer mudança no app troca a versão do cache
+#  automaticamente — os usuários recebem os arquivos novos sem
+#  você precisar editar o sw.js na mão.
+#
+#  Ativado por: git config core.hooksPath .githooks
+# ============================================================
+
+SW="sw.js"
+[ -f "$SW" ] || exit 0
+
+# Arquivos que compõem o "app shell" — mudança em qualquer um troca a versão.
+FILES="index.html style.css app.js data.js manifest.json"
+
+# Hash do conteúdo de todos os arquivos do shell + do sw.js SEM a linha de
+# versão (excluir a linha de versão torna o hash estável e idempotente).
+HASH=$(
+  {
+    for f in $FILES; do [ -f "$f" ] && cat "$f"; done
+    grep -v 'const CACHE_VERSION' "$SW"
+  } | shasum | cut -c1-8
+)
+
+NEW_VERSION="bolao-$HASH"
+
+# Já está na versão correta? Não faz nada.
+if grep -q "\"$NEW_VERSION\"" "$SW"; then
+  exit 0
+fi
+
+# Substitui a linha do CACHE_VERSION e re-adiciona o sw.js ao commit.
+sed -i.bak "s/const CACHE_VERSION = \".*\";/const CACHE_VERSION = \"$NEW_VERSION\";/" "$SW"
+rm -f "$SW.bak"
+
+git add "$SW"
+echo "PWA: CACHE_VERSION atualizado para $NEW_VERSION"

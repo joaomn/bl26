@@ -211,6 +211,43 @@ Para atualizar: edite `data.js` no GitHub e o Vercel publica automaticamente.
 
 ---
 
+## PWA (instalável no celular)
+
+O site é um **PWA** — pode ser instalado na tela inicial do celular e abre em
+tela cheia, como um app. No celular, o navegador oferece "Adicionar à tela
+inicial"; no desktop, aparece um ícone de instalar na barra de endereço.
+
+Arquivos que tornam isso possível (não precisa editar):
+
+```
+├── manifest.json   → nome, ícone, cores do app instalado
+└── sw.js           → service worker (cache + funcionamento offline)
+```
+
+**Como funciona o cache:**
+
+- Os arquivos do app (HTML/CSS/JS/ícone) ficam em cache → carrega rápido e a
+  interface abre mesmo sem internet.
+- Os **dados ao vivo** (planilha do Google Sheets: apostas, placar, status)
+  **nunca** são cacheados — sempre vêm frescos da rede.
+
+### Atualização automática do cache (importante)
+
+O `CACHE_VERSION` dentro do `sw.js` é **gerado automaticamente** por um hook de
+`git commit` (`.githooks/pre-commit`): toda vez que você commita uma mudança em
+qualquer arquivo do app, a versão do cache muda sozinha e os usuários recebem os
+arquivos novos. **Você não precisa editar o `sw.js` na mão.**
+
+> ⚠️ O hook depende de uma configuração **local** do git. Ela já está ativa
+> nesta máquina, mas se você **clonar o repositório em outro computador**, rode
+> uma vez:
+>
+> ```sh
+> git config core.hooksPath .githooks
+> ```
+
+---
+
 ## Segurança
 
 O login é **proteção visual** (client-side). Os e-mails ficam em `data.js`.  

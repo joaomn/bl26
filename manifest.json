@@ -1,0 +1,26 @@
+{
+  "name": "Bolão Melo da Copa",
+  "short_name": "Bolão Melo",
+  "description": "Bolão da Copa do Mundo — palpites, placares e prêmios ao vivo.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "icons": [
+    {
+      "src": "copa-do-mundo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "copa-do-mundo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
