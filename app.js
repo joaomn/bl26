@@ -23,6 +23,10 @@ let GLOBAL_STATUS_OVERRIDE = null;
 // vazias ou inválidas) -> mostra "? × ?".
 let GLOBAL_RESULT_OVERRIDE = null;
 
+// Total de participantes por jogo, derivado do próprio CSV de apostas do jogo.
+// game.id → { winners: string[], betsCount: number } | null
+let CACHED_BETS_WINNERS = {};
+
 // Status efetivo da última renderização — usado para detectar transições
 // e re-renderizar só quando algo realmente muda.
 let lastRenderedStatuses = {};
@@ -349,7 +353,7 @@ function startClocks() {
     tickCountdowns();
     checkStatusTransitions();
   }, 1000);
-  setInterval(refreshOverrides, 120000); // re-fetch compartilhado a cada 2 min
+  setInterval(refreshOverrides, 120000);  // re-fetch status/placar a cada 2 min
 }
 
 // ---------- TICKER ----------
@@ -379,23 +383,27 @@ function buildTicker() {
   track.innerHTML = html + "  <span class='ticker-sep'>|</span>  " + html;
 }
 
-// ---------- PHASE FILTERS ----------
+// ---------- GAME SELECTOR TABS ----------
 
-let activePhase = "all";
+let activeGameId = null;
 
 function buildFilters() {
-  const container = document.getElementById("phase-filters");
-  const phases = ["all", ...new Set(GAMES.map(g => g.phaseTag))];
-  const labels = { all: "Todos" };
-  GAMES.forEach(g => { labels[g.phaseTag] = g.phase; });
+  if (activeGameId === null) activeGameId = getActiveGame().id;
 
-  container.innerHTML = phases.map(ph =>
-    `<button class="filter-btn ${ph === activePhase ? "active" : ""}" data-phase="${ph}">${labels[ph]}</button>`
-  ).join("");
+  const container = document.getElementById("phase-filters");
+  container.innerHTML = GAMES.map((g, i) => {
+    const isActive = g.id === activeGameId;
+    const [y, m, d] = g.date.split("-");
+    const dateShort = `${d}/${m}`;
+    return `<button class="filter-btn ${isActive ? "active" : ""}" data-game="${g.id}">
+      <span class="filter-btn-flags">${g.homeTeam.flag} vs ${g.awayTeam.flag}</span>
+      <span class="filter-btn-meta">Jogo ${i + 1} · ${dateShort}</span>
+    </button>`;
+  }).join("");
 
   container.querySelectorAll(".filter-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      activePhase = btn.dataset.phase;
+      activeGameId = btn.dataset.game;
       buildFilters();
       buildGames();
     });
@@ -456,6 +464,44 @@ async function fetchBetRows(game) {
   }));
 }
 
+// ---------- BLOCO DE PRÊMIO DINÂMICO ----------
+
+function buildPrizeBlockHtml(winners, betsCount, game) {
+  // Jogos legados com totalPrize fixo usam esse valor; demais calculam pelo
+  // próprio CSV de apostas do jogo (uma linha = um participante).
+  const total = (game && game.totalPrize != null)
+    ? game.totalPrize
+    : betsCount * BET_VALUE_PER_PERSON;
+
+  if (winners.length === 0) {
+    return `<div class="prize-block no-winners">
+      <span class="prize-block-label">😬 Ninguém acertou o placar — prêmio acumula!</span>
+    </div>`;
+  }
+
+  const totalStr = `R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+  const perWinnerStr = `R$ ${(total / winners.length).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+  const chips = winners.map(n => `<span class="prize-winner-chip">🏅 ${n}</span>`).join("");
+  const divisao = winners.length > 1
+    ? `<span class="prize-divisao">${totalStr} ÷ ${winners.length} = ${perWinnerStr} cada</span>`
+    : `<span class="prize-divisao">${totalStr} para o ganhador</span>`;
+
+  return `<div class="prize-block has-winners">
+    <div class="prize-block-top">
+      <span class="prize-block-label">🏆 ${winners.length === 1 ? "Ganhador" : `${winners.length} Ganhadores`}</span>
+      ${divisao}
+    </div>
+    <div class="prize-winner-chips">${chips}</div>
+  </div>`;
+}
+
+function refreshPrizeBlock(gameId, { winners, betsCount }) {
+  const el = document.getElementById(`prize-block-${gameId}`);
+  const game = GAMES.find(g => g.id === gameId);
+  if (el) el.innerHTML = buildPrizeBlockHtml(winners, betsCount, game);
+}
+
 // ---------- RENDERIZA TABELA DE APOSTAS ----------
 
 async function loadBets(game) {
@@ -503,25 +549,22 @@ function renderBetsTable(section, game, bets) {
       </tr>`;
   }).join("");
 
-  const summaryHtml = hasResult
-    ? `<div class="bets-summary ${winners.length === 0 ? "no-winners" : "has-winners"}">
-        ${winners.length === 0
-          ? "😬 Ninguém acertou o placar — prêmio acumula!"
-          : `🎉 ${winners.length === 1 ? "Ganhador" : "Ganhadores"}: <strong>${winners.join(", ")}</strong>`}
-       </div>`
+  CACHED_BETS_WINNERS[game.id] = hasResult ? { winners, betsCount: bets.length } : null;
+
+  const prizeBlockHtml = hasResult
+    ? `<div id="prize-block-${game.id}">${buildPrizeBlockHtml(winners, bets.length, game)}</div>`
     : "";
 
-  // Botão "Ver ganhadores" só aparece quando há resultado configurado no data.js
-  // e o prazo já passou — permite varrer ao vivo durante o jogo
-  const winnerBtnHtml = game.csvUrl
+  // Botão "Ver ganhadores" só aparece quando não há resultado definitivo
+  const winnerBtnHtml = (!hasResult && game.csvUrl)
     ? `<button class="btn-check-winners" data-game="${game.id}">
         🏆 Ver ganhadores agora
        </button>
        <div class="winners-result" id="winners-${game.id}"></div>`
-    : "";
+    : `<div class="winners-result" id="winners-${game.id}"></div>`;
 
   section.innerHTML = `
-    ${summaryHtml}
+    ${prizeBlockHtml}
     ${winnerBtnHtml}
     <div class="bets-table-wrap">
       <table class="bets-table">
@@ -599,16 +642,15 @@ async function checkWinnersNow(game) {
 
 function buildGames() {
   const section = document.getElementById("games-section");
-  const filtered = activePhase === "all"
-    ? GAMES
-    : GAMES.filter(g => g.phaseTag === activePhase);
+  if (activeGameId === null) activeGameId = getActiveGame().id;
+  const filtered = GAMES.filter(g => g.id === activeGameId);
 
   const isAdmin = CURRENT_USER && CURRENT_USER.email &&
     CURRENT_USER.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
   updateAdminPanel(isAdmin);
 
   if (filtered.length === 0) {
-    section.innerHTML = `<div class="empty-state">Nenhum jogo nesta fase ainda.</div>`;
+    section.innerHTML = `<div class="empty-state">Nenhum jogo encontrado.</div>`;
     return;
   }
 

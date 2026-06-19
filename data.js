@@ -12,7 +12,7 @@
 // Coluna C (índice 2) = nomes
 // ------------------------------------------------------------------
 const PARTICIPANTS_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv";
 
 // E-mail do organizador — sempre tem acesso
 const ADMIN_EMAIL = "joaoaraujomn@gmail.com";
@@ -51,7 +51,7 @@ const ADMIN_EMAIL = "joaoaraujomn@gmail.com";
 
 // CSV publicado da aba "Status" (Arquivo → Publicar na web → aba Status → CSV)
 const STATUS_CONFIG_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?gid=1548384129&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?gid=362647876&single=true&output=csv";
 
 // URL do Apps Script publicado como App da Web (termina em /exec) — opcional
 const STATUS_WRITE_URL = "";
@@ -91,11 +91,12 @@ const GAMES = [
     time: "19:00",
     venue: "MetLife Stadium, Nova Jersey",
     status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
-    result: null,             // { home: 2, away: 1 } quando terminar
+    result: { home: 1, away: 1 },             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?output=csv",
     betDeadline: "2026-06-13T18:59:00",  // horário de Recife
     finishAt: "2026-06-13T19:00:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
+    totalPrize: 200,  // fixo: total arrecadado neste jogo (preencher após encerramento)
   },
    {
     id: "jogo2",
@@ -108,7 +109,7 @@ const GAMES = [
     venue: "Estádio da Filadélfia, Filadélfia",
     status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
-    csvUrl: "",
+    csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv",
     betDeadline: "2026-06-19T21:29:00",  // horário de Recife
     finishAt: "2026-06-19T21:30:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
