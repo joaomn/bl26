@@ -104,7 +104,7 @@ const GAMES = [
     phase: "Fase de Grupos",
     phaseTag: "grupos",
     homeTeam: { name: "Brasil",   flag: "🇧🇷" },
-    awayTeam: { name: "Haiti", flag: "🇲🇭" },
+    awayTeam: { name: "Haiti", flag: "🇭🇹" },
     date: "2026-06-19",
     time: "21:30",
     venue: "Estádio da Filadélfia, Filadélfia",
