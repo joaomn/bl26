@@ -456,6 +456,7 @@ function startClocks() {
   }, 1000);
   setInterval(refreshOverrides, 120000);   // re-fetch status (aba A1) a cada 2 min
   setInterval(refreshLiveScores, 45000);   // re-fetch placar ao vivo (ESPN) a cada 45s
+  setInterval(refreshArrecadado, 30000);   // total arrecadado ao vivo a cada 30s
 }
 
 // ---------- TICKER ----------
@@ -568,8 +569,11 @@ let CACHED_MY_BETS = {};
 // Contagem de apostas por jogo (para calcular prêmio dinâmico). game.id → number
 let CACHED_BETS_COUNT = {};
 
-async function loadMyBet(game) {
-  if (!game.csvUrl || CACHED_MY_BETS[game.id] !== undefined) {
+// Busca as apostas do jogo e atualiza a contagem (total arrecadado) + o meu
+// palpite. SEM cache-guard: pode ser chamada repetidamente para manter o total
+// arrecadado sempre ao vivo, independente do status do jogo.
+async function refreshGameBets(game) {
+  if (!game.csvUrl) {
     renderMyBet();
     renderGamePrize(game);
     return;
@@ -581,10 +585,27 @@ async function loadMyBet(game) {
     CACHED_MY_BETS[game.id] = mine ? { golsCasa: mine.golsCasa, golsFora: mine.golsFora } : null;
     CACHED_BETS_COUNT[game.id] = bets.length;
   } catch {
-    CACHED_MY_BETS[game.id] = null;
+    if (CACHED_MY_BETS[game.id] === undefined) CACHED_MY_BETS[game.id] = null;
   }
   renderMyBet();
   renderGamePrize(game);
+}
+
+// Usado na renderização: se já temos em cache, só repinta (rápido); senão busca.
+async function loadMyBet(game) {
+  if (!game.csvUrl || CACHED_MY_BETS[game.id] !== undefined) {
+    renderMyBet();
+    renderGamePrize(game);
+    return;
+  }
+  await refreshGameBets(game);
+}
+
+// Mantém o TOTAL ARRECADADO atualizado o tempo todo (mesmo antes do jogo
+// começar), re-buscando as apostas do jogo selecionado periodicamente.
+function refreshArrecadado() {
+  const game = GAMES.find(g => g.id === activeGameId);
+  if (game && game.csvUrl && game.totalPrize == null) refreshGameBets(game);
 }
 
 function renderGamePrize(game) {
