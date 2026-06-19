@@ -458,10 +458,44 @@ async function fetchBetRows(game) {
   const rows = parseCSV(text);
   const keys = Object.keys(rows[0] || {});
   return rows.map(row => ({
+    email:    (row["Endereço de e-mail"] || row["Email"] || row[keys[1]] || "").trim().toLowerCase(),
     nome:     row["Nome :"] || row["Nome"] || row[keys[2]] || "—",
     golsCasa: parseInt(row["Numero de gols do Brasil"] || row[keys[3]]),
     golsFora: parseInt(row["Numero de gols do Marrocos"] || row[keys[4]]),
   }));
+}
+
+// Palpite do usuário logado por jogo. game.id → {golsCasa, golsFora} | null
+let CACHED_MY_BETS = {};
+
+async function loadMyBet(game) {
+  if (!game.csvUrl || CACHED_MY_BETS[game.id] !== undefined) {
+    renderMyBet();
+    return;
+  }
+  try {
+    const bets = await fetchBetRows(game);
+    const userEmail = CURRENT_USER?.email?.trim().toLowerCase();
+    const mine = bets.find(b => b.email === userEmail) || null;
+    CACHED_MY_BETS[game.id] = mine ? { golsCasa: mine.golsCasa, golsFora: mine.golsFora } : null;
+  } catch {
+    CACHED_MY_BETS[game.id] = null;
+  }
+  renderMyBet();
+}
+
+function renderMyBet() {
+  const el = document.getElementById("my-bet-badge");
+  if (!el) return;
+  const game = GAMES.find(g => g.id === activeGameId);
+  if (!game) { el.style.display = "none"; return; }
+  const bet = CACHED_MY_BETS[game.id];
+  if (!bet || isNaN(bet.golsCasa) || isNaN(bet.golsFora)) {
+    el.style.display = "none";
+    return;
+  }
+  el.textContent = `${game.homeTeam.flag} ${bet.golsCasa} × ${bet.golsFora} ${game.awayTeam.flag}`;
+  el.style.display = "";
 }
 
 // ---------- BLOCO DE PRÊMIO DINÂMICO ----------
@@ -705,6 +739,7 @@ function buildGames() {
 
   filtered.forEach(game => {
     if (showBets(game) && game.csvUrl) loadBets(game);
+    if (game.csvUrl) loadMyBet(game);
   });
 
   tickCountdowns(); // preenche os cronômetros imediatamente após renderizar
@@ -806,7 +841,11 @@ async function doLogin() {
     const result = await validateEmailInSheet(email);
 
     if (!result.valid) {
-      error.textContent = "E-mail não encontrado. Verifique se você se inscreveu e o pagamento foi confirmado.";
+      const registerBtn = document.getElementById("register-btn");
+      const hasForm = registerBtn && registerBtn.style.display !== "none";
+      error.innerHTML = hasForm
+        ? `E-mail não encontrado. Se ainda não fez sua aposta, clique em <strong>"Fazer minha aposta"</strong> abaixo para participar e ter acesso.`
+        : `E-mail não encontrado. Verifique se você se inscreveu e o pagamento foi confirmado.`;
       input.classList.add("input-shake");
       setTimeout(() => input.classList.remove("input-shake"), 500);
       return;
@@ -860,11 +899,11 @@ document.addEventListener("DOMContentLoaded", () => {
     enterApp({ email: savedEmail, name: savedName });
   }
 
-  // Botão de registro: aponta para o form do jogo ativo com apostas abertas
-  const activeGame = getActiveGame();
+  // Botão de registro: primeiro jogo com formUrl e apostas abertas
   const registerBtn = document.getElementById("register-btn");
-  if (activeGame && activeGame.formUrl && resolveStatus(activeGame) === "open") {
-    registerBtn.href = activeGame.formUrl;
+  const openGame = GAMES.find(g => g.formUrl && autoStatus(g) === "open");
+  if (openGame) {
+    registerBtn.href = openGame.formUrl;
     registerBtn.style.display = "";
   }
 
