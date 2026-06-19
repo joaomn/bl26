@@ -112,7 +112,7 @@ html, body {
 
 .input-group {
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .input-group label {
@@ -146,10 +146,13 @@ html, body {
 
 .input-error {
   display: block;
-  min-height: 20px;
   color: #fc8181;
   font-size: 0.8rem;
   margin-top: 6px;
+}
+
+.input-error:empty {
+  display: none;
 }
 
 .btn-primary {
@@ -190,6 +193,33 @@ html, body {
   text-decoration: none;
   margin-top: 12px;
   transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-register::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -80%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,0.22) 50%,
+    rgba(255,255,255,0)    100%
+  );
+  transform: skewX(-18deg);
+  animation: glass-shine 2.2s ease-in-out infinite;
+}
+
+@keyframes glass-shine {
+  0%   { left: -80%; opacity: 0; }
+  8%   { opacity: 1; }
+  38%  { left: 130%; opacity: 1; }
+  39%  { opacity: 0; }
+  100% { left: 130%; opacity: 0; }
 }
 
 .btn-register:hover {

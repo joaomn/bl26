@@ -184,6 +184,22 @@ function getActiveGame() {
   return started || next || GAMES[0];
 }
 
+// Jogo padrão ao carregar a página: o mais próximo da data/hora atual,
+// seja passado ou futuro. Diferente de getActiveGame() que prioriza o
+// mais recentemente iniciado para fins de override de status/placar.
+function getDefaultGame() {
+  const now = Date.now();
+  let closest = GAMES[0];
+  let minDiff = Infinity;
+  for (const g of GAMES) {
+    const kickoff = kickoffEpoch(g);
+    if (isNaN(kickoff)) continue;
+    const diff = Math.abs(kickoff - now);
+    if (diff < minDiff) { minDiff = diff; closest = g; }
+  }
+  return closest;
+}
+
 // Status efetivo do jogo: override global do organizador vence (só para o
 // jogo ativo); senão, o tempo.
 function resolveStatus(game) {
@@ -388,7 +404,7 @@ function buildTicker() {
 let activeGameId = null;
 
 function buildFilters() {
-  if (activeGameId === null) activeGameId = getActiveGame().id;
+  if (activeGameId === null) activeGameId = getDefaultGame().id;
 
   const container = document.getElementById("phase-filters");
   container.innerHTML = GAMES.map((g, i) => {
@@ -414,39 +430,35 @@ function buildFilters() {
 
 // Conta e-mails únicos na planilha de participantes e exibe o total
 // arrecadado (cada e-mail = 1 pessoa = R$ 20,00).
-async function buildStatsBox() {
+function buildStatsBox() {
   const box = document.getElementById("stats-box");
   if (!box) return;
 
-  box.innerHTML = `<div class="stats-loading">⏳ Calculando total arrecadado...</div>`;
+  const game = GAMES.find(g => g.id === activeGameId) || getActiveGame();
+  if (!game) return;
 
-  try {
-    const text = await fetchCSV(PARTICIPANTS_CSV_URL);
-    const rows = parseCSV(text);
+  const [y, m, d] = game.date.split("-");
+  const dateShort = `${d}/${m}`;
 
-    const emails = new Set();
-    rows.forEach(row => {
-      const email = (
-        row["Endereço de e-mail"] ||
-        row["Email"] ||
-        row["email"] ||
-        Object.values(row)[1] ||
-        ""
-      ).trim().toLowerCase();
-      if (email) emails.add(email);
-    });
+  const total = game.totalPrize != null
+    ? game.totalPrize
+    : (CACHED_BETS_COUNT[game.id] != null ? CACHED_BETS_COUNT[game.id] * BET_VALUE_PER_PERSON : null);
 
-    const total = emails.size * BET_VALUE_PER_PERSON;
-    const perPerson = BET_VALUE_PER_PERSON.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-
-    box.innerHTML = `
-      <div class="stats-value">💰 R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
-      <div class="stats-detail">${emails.size} ${emails.size === 1 ? "participante" : "participantes"} · R$ ${perPerson} cada</div>
-    `;
-  } catch (err) {
-    box.innerHTML = `<div class="stats-error">⚠️ Não foi possível calcular o total arrecadado.</div>`;
-    console.error(err);
+  if (total === null) {
+    box.innerHTML = `<div class="stats-loading">⏳ Calculando prêmio...</div>`;
+    return;
   }
+
+  const count = game.totalPrize != null
+    ? Math.round(game.totalPrize / BET_VALUE_PER_PERSON)
+    : (CACHED_BETS_COUNT[game.id] ?? 0);
+
+  const totalStr = `R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+  box.innerHTML = `
+    <div class="stats-value">💰 ${totalStr} arrecadados</div>
+    <div class="stats-detail">${count} ${count === 1 ? "participante" : "participantes"} · Bolão de ${dateShort}</div>
+  `;
 }
 
 // ---------- BETS TABLE ----------
@@ -467,10 +479,13 @@ async function fetchBetRows(game) {
 
 // Palpite do usuário logado por jogo. game.id → {golsCasa, golsFora} | null
 let CACHED_MY_BETS = {};
+// Contagem de apostas por jogo (para calcular prêmio dinâmico). game.id → number
+let CACHED_BETS_COUNT = {};
 
 async function loadMyBet(game) {
   if (!game.csvUrl || CACHED_MY_BETS[game.id] !== undefined) {
     renderMyBet();
+    renderGamePrize(game);
     return;
   }
   try {
@@ -478,10 +493,26 @@ async function loadMyBet(game) {
     const userEmail = CURRENT_USER?.email?.trim().toLowerCase();
     const mine = bets.find(b => b.email === userEmail) || null;
     CACHED_MY_BETS[game.id] = mine ? { golsCasa: mine.golsCasa, golsFora: mine.golsFora } : null;
+    CACHED_BETS_COUNT[game.id] = bets.length;
   } catch {
     CACHED_MY_BETS[game.id] = null;
   }
   renderMyBet();
+  renderGamePrize(game);
+}
+
+function renderGamePrize(game) {
+  const el = document.getElementById(`prize-info-${game.id}`);
+  if (!el) return;
+  const [y, m, d] = game.date.split("-");
+  const dateShort = `${d}/${m}`;
+  const total = game.totalPrize != null
+    ? game.totalPrize
+    : (CACHED_BETS_COUNT[game.id] != null ? CACHED_BETS_COUNT[game.id] * BET_VALUE_PER_PERSON : null);
+  if (total === null) return;
+  const totalStr = `R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+  el.textContent = `💰 ${totalStr} arrecadados para o Bolão de ${dateShort}`;
+  buildStatsBox();
 }
 
 function renderMyBet() {
@@ -676,7 +707,7 @@ async function checkWinnersNow(game) {
 
 function buildGames() {
   const section = document.getElementById("games-section");
-  if (activeGameId === null) activeGameId = getActiveGame().id;
+  if (activeGameId === null) activeGameId = getDefaultGame().id;
   const filtered = GAMES.filter(g => g.id === activeGameId);
 
   const isAdmin = CURRENT_USER && CURRENT_USER.email &&
@@ -726,7 +757,13 @@ function buildGames() {
           <span>📅 ${formatDate(game.date)} às ${game.time}</span>
           <span>📍 ${game.venue}</span>
         </div>
-        <div class="game-prize">💰 ${game.prizeInfo}</div>
+        <div class="game-prize" id="prize-info-${game.id}">${(() => {
+          if (game.totalPrize != null) {
+            const [y, m, d] = game.date.split("-");
+            return `💰 R$ ${game.totalPrize.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} arrecadados para o Bolão de ${d}/${m}`;
+          }
+          return `💰 ${game.prizeInfo}`;
+        })()}</div>
         <div class="game-deadline">⏰ Apostas até: <strong>${formatDeadline(game.betDeadline)}</strong></div>
         ${renderCountdowns(game)}
         ${betsBlock}
