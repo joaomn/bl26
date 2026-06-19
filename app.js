@@ -200,10 +200,17 @@ function getDefaultGame() {
   return closest;
 }
 
+// Jogo que recebe o override da aba "Status" (A1 = status, C1/D1 = placar):
+// o mais próximo da data/hora atual. Assim, no dia do jogo, o placar ao vivo
+// cai no card certo o dia inteiro — não só depois do pontapé inicial.
+function getOverrideTargetGame() {
+  return getDefaultGame();
+}
+
 // Status efetivo do jogo: override global do organizador vence (só para o
-// jogo ativo); senão, o tempo.
+// jogo alvo do override); senão, o tempo.
 function resolveStatus(game) {
-  if (GLOBAL_STATUS_OVERRIDE && game.id === getActiveGame().id) return GLOBAL_STATUS_OVERRIDE;
+  if (GLOBAL_STATUS_OVERRIDE && game.id === getOverrideTargetGame().id) return GLOBAL_STATUS_OVERRIDE;
   return autoStatus(game);
 }
 
@@ -232,10 +239,10 @@ function normalizeStatusValue(raw) {
 
 // Placar efetivo do jogo: usa o "result" fixo do data.js se existir; senão,
 // cai no override lido das células C1/D1 da aba "Status" — só para o jogo
-// ativo (os demais ficam com placar pendente "? × ?").
+// alvo do override (os demais ficam com placar pendente "? × ?").
 function resolveResult(game) {
   if (game.result) return game.result;
-  if (game.id === getActiveGame().id) return GLOBAL_RESULT_OVERRIDE;
+  if (game.id === getOverrideTargetGame().id) return GLOBAL_RESULT_OVERRIDE;
   return null;
 }
 
