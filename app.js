@@ -1037,9 +1037,78 @@ function doLogout() {
   document.getElementById("email-error").textContent = "";
 }
 
+// ---------- PIX COPIA E COLA (BR Code do Banco Central, client-side) ----------
+
+// Monta um campo no formato EMV/TLV: id(2) + tamanho(2) + valor.
+function pixTLV(id, value) {
+  return id + String(value.length).padStart(2, "0") + value;
+}
+
+// CRC16-CCITT (polinômio 0x1021, init 0xFFFF) exigido no fim do BR Code.
+function pixCRC16(str) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+// Gera o código "copia e cola" do PIX (estático, com valor fixo).
+function gerarPixCopiaECola({ chave, nome, cidade, valor }) {
+  const merchant = pixTLV("26", pixTLV("00", "br.gov.bcb.pix") + pixTLV("01", chave));
+  const payload =
+    pixTLV("00", "01") +              // formato do payload
+    merchant +                        // conta do recebedor (GUI + chave)
+    pixTLV("52", "0000") +            // categoria do estabelecimento (não usada)
+    pixTLV("53", "986") +             // moeda: BRL
+    (valor ? pixTLV("54", valor) : "") +
+    pixTLV("58", "BR") +              // país
+    pixTLV("59", nome) +              // nome do recebedor
+    pixTLV("60", cidade) +            // cidade do recebedor
+    pixTLV("62", pixTLV("05", "***")) + // txid (estático)
+    "6304";                           // id+tamanho do CRC (valor calculado abaixo)
+  return payload + pixCRC16(payload);
+}
+
+// Código gerado uma vez (config fixa em data.js).
+const PIX_COPIA_COLA = gerarPixCopiaECola(PIX_CONFIG);
+
+// Liga os botões de PIX (login e arrecadação): revela o código e copia.
+function setupPix() {
+  document.querySelectorAll(".pix-code").forEach(el => { el.textContent = PIX_COPIA_COLA; });
+
+  [["pix-btn-login", "pix-box-login"], ["pix-btn-stats", "pix-box-stats"]].forEach(([btnId, boxId]) => {
+    const btn = document.getElementById(btnId);
+    const box = document.getElementById(boxId);
+    if (btn && box) {
+      btn.addEventListener("click", () => {
+        box.style.display = box.style.display === "none" ? "" : "none";
+      });
+    }
+  });
+
+  document.querySelectorAll(".btn-pix-copy").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const original = btn.textContent;
+      try {
+        await navigator.clipboard.writeText(PIX_COPIA_COLA);
+        btn.textContent = "✅ Copiado!";
+      } catch {
+        btn.textContent = "Selecione e copie o código acima";
+      }
+      setTimeout(() => { btn.textContent = original; }, 2200);
+    });
+  });
+}
+
 // ---------- INIT ----------
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupPix();
   const savedEmail = sessionStorage.getItem(STORAGE_KEY);
   const savedName  = sessionStorage.getItem(STORAGE_NAME);
   if (savedEmail && savedName) {

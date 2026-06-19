@@ -18,6 +18,18 @@ const PARTICIPANTS_CSV_URL =
 const ADMIN_EMAIL = "joaoaraujomn@gmail.com";
 
 // ------------------------------------------------------------------
+// PIX (copia e cola) — dados do recebedor p/ gerar o código de pagamento.
+// O código é montado 100% no navegador (sem backend). Regras do padrão:
+// nome ≤ 25 e cidade ≤ 15 caracteres, em MAIÚSCULAS e SEM acento.
+// ------------------------------------------------------------------
+const PIX_CONFIG = {
+  chave:  "joaoaraujomn@gmail.com",   // chave PIX (aqui: e-mail)
+  nome:   "JOAO ARAUJO MELO NETO",    // nome do recebedor (≤ 25)
+  cidade: "OLINDA",                   // cidade do recebedor (≤ 15)
+  valor:  "20.00",                    // valor fixo da aposta (R$ 20,00)
+};
+
+// ------------------------------------------------------------------
 // OVERRIDE DE STATUS E PLACAR COMPARTILHADOS (sem deploy)
 //
 // O status e o placar do "jogo ativo" podem ser atualizados ao vivo — e a

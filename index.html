@@ -43,6 +43,12 @@
       <a class="btn-register" id="register-btn" href="#" target="_blank" rel="noopener" style="display:none">
         Fazer minha aposta
       </a>
+      <button class="btn-pix" id="pix-btn-login" type="button">Pagar R$ 20 via PIX</button>
+      <div class="pix-box" id="pix-box-login" style="display:none">
+        <p class="pix-hint">Copie o código e pague no app do seu banco:</p>
+        <code class="pix-code" id="pix-code-login"></code>
+        <button class="btn-pix-copy" type="button">📋 Copiar código PIX</button>
+      </div>
       <p class="login-hint">Não consegue acessar? Fale com o organizador.</p>
     </div>
   </div>
@@ -76,6 +82,16 @@
 
       <!-- TOTAL ARRECADADO -->
       <section class="stats-box" id="stats-box"></section>
+
+      <!-- PAGAMENTO VIA PIX -->
+      <section class="pix-section">
+        <p class="pix-desc">Ainda não fez o PIX? Gere o código copia e cola abaixo 👇</p>
+        <button class="btn-pix" id="pix-btn-stats" type="button">Pagar R$ 20 via PIX</button>
+        <div class="pix-box" id="pix-box-stats" style="display:none">
+          <code class="pix-code" id="pix-code-stats"></code>
+          <button class="btn-pix-copy" type="button">📋 Copiar código PIX</button>
+        </div>
+      </section>
 
       <!-- PAINEL DO ORGANIZADOR (override de status, só para o admin) -->
       <section class="admin-panel" id="admin-panel"></section>

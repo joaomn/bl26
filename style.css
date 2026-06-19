@@ -227,6 +227,87 @@ html, body {
   border-color: var(--green-light);
 }
 
+/* ---------- PIX (copia e cola) ---------- */
+
+.btn-pix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(50,188,173,0.45);
+  background: rgba(50,188,173,0.10);
+  color: #3FD0C0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+
+.btn-pix:hover {
+  background: rgba(50,188,173,0.20);
+  border-color: #3FD0C0;
+}
+
+.pix-box {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pix-hint {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.pix-code {
+  display: block;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  text-align: left;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--gray-100);
+  user-select: all;
+}
+
+.btn-pix-copy {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #32BCAD;
+  color: #06302B;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-pix-copy:hover { background: #3FD0C0; }
+.btn-pix-copy:active { transform: scale(0.98); }
+
+/* Bloco de PIX abaixo da arrecadação (tela principal) */
+.pix-section {
+  max-width: 560px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+
+.pix-desc {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  margin-bottom: 4px;
+}
+
 .login-hint {
   margin-top: 20px;
   color: var(--gray-600);
