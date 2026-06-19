@@ -90,6 +90,7 @@ const GAMES = [
     date: "2026-06-13",
     time: "19:00",
     venue: "MetLife Stadium, Nova Jersey",
+    espnHome: "Brazil", espnAway: "Morocco",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
     status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: { home: 1, away: 1 },             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?output=csv",
@@ -108,6 +109,7 @@ const GAMES = [
     date: "2026-06-19",
     time: "21:30",
     venue: "Estádio da Filadélfia, Filadélfia",
+    espnHome: "Brazil", espnAway: "Haiti",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
     status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv",
@@ -124,6 +126,7 @@ const GAMES = [
     date: "2026-06-24",
     time: "19:00",
     venue: "Estádio da Miami, Miami Gardens",
+    espnHome: "Brazil", espnAway: "Scotland",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
     status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "",

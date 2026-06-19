@@ -93,27 +93,52 @@ encerradas" / "Bola rolando".
 
 ---
 
-## Mudar o status e o placar pelo site, ao vivo, para TODOS (override do organizador)
+## Placar automático ao vivo (API da ESPN)
 
-O status e o placar do **jogo ativo** podem ser atualizados por uma única aba
-chamada **`Status`** na sua planilha — sem deploy, refletindo para todos os
-participantes:
+O **placar é atualizado sozinho**, ao vivo, buscando da API pública da ESPN
+(grátis, sem chave, sem backend). Cada jogo no `data.js` tem dois campos com os
+nomes dos times **em inglês** para casar com a API:
 
-> O "jogo ativo" é detectado automaticamente pelo site: é o jogo já iniciado
-> mais recentemente (data/hora de início já passou), ou — se nenhum jogo
-> começou ainda — o próximo da lista a começar. Os outros jogos **não** são
-> afetados pela aba `Status`: continuam com seu próprio placar ("`? × ?`"
-> até você preencher `result` no `data.js`) e seu próprio status automático.
+```js
+espnHome: "Brazil", espnAway: "Haiti",
+```
+
+- Enquanto o jogo está **rolando ou encerrado**, o placar real aparece no card
+  e no ticker, atualizando a cada ~45s — sem você fazer nada.
+- Antes do apito, fica "`? × ?`".
+- Se você preencher `result: { home, away }` no `data.js` (jogo finalizado),
+  esse valor **fixo vence** o automático.
+
+**Prioridade do placar:**
+
+1. `result` fixo no `data.js` (jogo encerrado)
+2. Placar ao vivo da **ESPN** (automático)
+3. **C1/D1 da aba `Status`** — *fallback manual*, caso a API da ESPN caia ou
+   atrase você assume o placar na mão (veja abaixo)
+4. "`? × ?`" (pendente)
+
+> 💡 Ou seja: no dia a dia você não toca em nada. Mas se a ESPN falhar, é só
+> preencher os gols em **C1** (casa) e **D1** (visitante) da aba `Status` que o
+> placar volta a aparecer pra todo mundo.
+
+---
+
+## Mudar o status (e placar de emergência) pelo site, para TODOS (override do organizador)
+
+O **jogo ativo** pode ser controlado por uma aba chamada **`Status`** na sua
+planilha — sem deploy, refletindo para todos os participantes:
+
+> O "jogo ativo" é detectado automaticamente pelo site: é o jogo mais próximo
+> da data/hora atual. Os outros jogos **não** são afetados pela aba `Status`.
 
 | Célula | Conteúdo | Efeito |
 |--------|----------|--------|
 | **A1** | status do bolão | vence o cálculo automático para **todos os jogos**. Vazia (ou "Auto") = volta ao cálculo por horário. |
-| **C1** | gols do time da casa (Brasil) | placar exibido no card e no ticker |
-| **D1** | gols do time visitante | placar exibido no card e no ticker |
+| **C1** | gols da casa (Brasil) | *fallback* de placar: só vale se a ESPN não trouxer placar ao vivo |
+| **D1** | gols do visitante | *fallback* de placar (idem) |
 
-C1/D1 vazios (ou não numéricos) = placar pendente ("`? × ?`"). Preenchendo os
-dois com números, o placar aparece imediatamente para todo mundo — útil para
-ir atualizando ao vivo durante a partida.
+> C1/D1 só entram em ação se a API da ESPN falhar — no normal, o placar é
+> automático. Preencha os dois com números; vazios = sem fallback.
 
 Valores aceitos em A1 (sem diferenciar maiúsculas/minúsculas ou acentos):
 

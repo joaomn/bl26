@@ -31,6 +31,12 @@ let CACHED_BETS_WINNERS = {};
 // e re-renderizar só quando algo realmente muda.
 let lastRenderedStatuses = {};
 
+// Placar ao vivo lido da API da ESPN. game.id → { home, away, state }
+// state: "pre" (antes) | "in" (rolando) | "post" (encerrado).
+let LIVE_SCORES = {};
+// Assinatura do último placar renderizado, p/ rebuild só quando muda um gol.
+let lastLiveSig = "";
+
 // Garante que os timers globais sejam registrados uma única vez.
 let clocksStarted = false;
 
@@ -237,12 +243,27 @@ function normalizeStatusValue(raw) {
   return STATUS_SYNONYMS[v] || null;
 }
 
-// Placar efetivo do jogo: usa o "result" fixo do data.js se existir; senão,
-// cai no override lido das células C1/D1 da aba "Status" — só para o jogo
-// alvo do override (os demais ficam com placar pendente "? × ?").
+// Placar efetivo do jogo, nesta ordem de prioridade:
+//   1. "result" fixo no data.js (jogo encerrado e fechado pelo organizador)
+//   2. placar AO VIVO da ESPN (quando o jogo está rolando ou já terminou)
+//   3. C1/D1 da aba "Status" — FALLBACK manual, caso a API da ESPN falhe/atrase
+//      (só para o jogo alvo do override)
+//   4. "? × ?" (pendente)
 function resolveResult(game) {
   if (game.result) return game.result;
-  if (game.id === getOverrideTargetGame().id) return GLOBAL_RESULT_OVERRIDE;
+
+  const live = LIVE_SCORES[game.id];
+  if (live && (live.state === "in" || live.state === "post") &&
+      !isNaN(live.home) && !isNaN(live.away)) {
+    return { home: live.home, away: live.away };
+  }
+
+  // Fallback manual: a ESPN não trouxe placar utilizável → usa C1/D1 se o
+  // organizador tiver preenchido (vale só para o jogo alvo do override).
+  if (GLOBAL_RESULT_OVERRIDE && game.id === getOverrideTargetGame().id) {
+    return GLOBAL_RESULT_OVERRIDE;
+  }
+
   return null;
 }
 
@@ -326,20 +347,77 @@ function parseResultOverride(homeRaw, awayRaw) {
 // placar); se não houver URL configurada, usa o fallback local
 // (localStorage) só para o status.
 async function refreshOverrides() {
+  const before = `${GLOBAL_STATUS_OVERRIDE}|${JSON.stringify(GLOBAL_RESULT_OVERRIDE)}`;
+
   if (!STATUS_CONFIG_CSV_URL) {
     GLOBAL_STATUS_OVERRIDE = loadLocalOverride();
-    return;
+  } else {
+    try {
+      const text = await fetchCSV(STATUS_CONFIG_CSV_URL);
+      const clean = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+      const firstLine = clean.split(/\r?\n/)[0] || "";
+      const cols = splitCSVLine(firstLine);
+      GLOBAL_STATUS_OVERRIDE = normalizeStatusValue(cols[0] || "");
+      GLOBAL_RESULT_OVERRIDE = parseResultOverride(cols[2], cols[3]);
+    } catch (err) {
+      console.warn("Falha ao buscar override de status/placar da planilha:", err);
+      // mantém o que já tínhamos em memória
+    }
   }
+
+  // Se o status OU o placar manual (fallback C1/D1) mudou, repinta a tela.
+  const after = `${GLOBAL_STATUS_OVERRIDE}|${JSON.stringify(GLOBAL_RESULT_OVERRIDE)}`;
+  if (after !== before && clocksStarted) {
+    buildGames();
+    buildTicker();
+  }
+}
+
+// ---------- PLACAR AO VIVO (API pública da ESPN, grátis e sem chave) ----------
+// Endpoint da Copa (fifa.world). CORS liberado → chamado direto do navegador,
+// sem backend nem proxy. Casa cada jogo pelos nomes em inglês (espnHome/espnAway).
+const ESPN_SCOREBOARD_URL =
+  "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+
+async function fetchLiveScore(game) {
+  if (!game.espnHome || !game.espnAway || !game.date) return;
+  const dateStr = game.date.replace(/-/g, ""); // YYYY-MM-DD → YYYYMMDD
   try {
-    const text = await fetchCSV(STATUS_CONFIG_CSV_URL);
-    const clean = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
-    const firstLine = clean.split(/\r?\n/)[0] || "";
-    const cols = splitCSVLine(firstLine);
-    GLOBAL_STATUS_OVERRIDE = normalizeStatusValue(cols[0] || "");
-    GLOBAL_RESULT_OVERRIDE = parseResultOverride(cols[2], cols[3]);
+    const res = await fetch(`${ESPN_SCOREBOARD_URL}?dates=${dateStr}`, {
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const norm = (s) => (s || "").trim().toLowerCase();
+    for (const ev of data.events || []) {
+      const comp = (ev.competitions || [])[0];
+      if (!comp || !comp.competitors) continue;
+      const homeC = comp.competitors.find((c) => norm(c.team?.displayName) === norm(game.espnHome));
+      const awayC = comp.competitors.find((c) => norm(c.team?.displayName) === norm(game.espnAway));
+      if (!homeC || !awayC) continue;
+      const state = ev.status?.type?.state || comp.status?.type?.state || "pre";
+      LIVE_SCORES[game.id] = {
+        home: parseInt(homeC.score),
+        away: parseInt(awayC.score),
+        state,
+      };
+      return;
+    }
   } catch (err) {
-    console.warn("Falha ao buscar override de status/placar da planilha:", err);
-    // mantém o que já tínhamos em memória
+    console.warn("Falha ao buscar placar ao vivo da ESPN:", err);
+  }
+}
+
+// Atualiza o placar ao vivo de todos os jogos sem resultado fixo e re-renderiza
+// só quando algum gol muda (gols são raros, então o rebuild é barato).
+async function refreshLiveScores() {
+  const alvos = GAMES.filter((g) => !g.result && g.espnHome && g.espnAway);
+  await Promise.all(alvos.map(fetchLiveScore));
+  const sig = JSON.stringify(LIVE_SCORES);
+  if (sig !== lastLiveSig) {
+    lastLiveSig = sig;
+    buildGames();
+    buildTicker();
   }
 }
 
@@ -376,7 +454,8 @@ function startClocks() {
     tickCountdowns();
     checkStatusTransitions();
   }, 1000);
-  setInterval(refreshOverrides, 120000);  // re-fetch status/placar a cada 2 min
+  setInterval(refreshOverrides, 120000);   // re-fetch status (aba A1) a cada 2 min
+  setInterval(refreshLiveScores, 45000);   // re-fetch placar ao vivo (ESPN) a cada 45s
 }
 
 // ---------- TICKER ----------
@@ -922,6 +1001,9 @@ async function enterApp(participant) {
   await refreshOverrides();
   buildGames();
   buildTicker();
+
+  // Busca o placar ao vivo da ESPN (re-renderiza sozinho quando chega).
+  refreshLiveScores();
 }
 
 function doLogout() {
