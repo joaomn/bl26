@@ -93,6 +93,7 @@ const GAMES = [
     status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: { home: 1, away: 1 },             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?output=csv",
+    formUrl: "",
     betDeadline: "2026-06-13T18:59:00",  // horário de Recife
     finishAt: "2026-06-13T19:00:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
@@ -107,9 +108,10 @@ const GAMES = [
     date: "2026-06-19",
     time: "21:30",
     venue: "Estádio da Filadélfia, Filadélfia",
-    status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv",
+    formUrl: "https://forms.gle/YHQvHJqi6Z9thpR98",
     betDeadline: "2026-06-19T21:29:00",  // horário de Recife
     finishAt: "2026-06-19T21:30:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",
@@ -125,6 +127,7 @@ const GAMES = [
     status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
     csvUrl: "",
+    formUrl: "",
     betDeadline: "2026-06-24T18:59:00",  // horário de Recife
     finishAt: "2026-06-24T19:00:00",     // horário de Recife: vira "finished" às 19h
     prizeInfo: "R$ 20,00 por participante · Acumula se ninguém acertar",

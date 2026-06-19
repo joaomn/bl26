@@ -860,6 +860,14 @@ document.addEventListener("DOMContentLoaded", () => {
     enterApp({ email: savedEmail, name: savedName });
   }
 
+  // Botão de registro: aponta para o form do jogo ativo com apostas abertas
+  const activeGame = getActiveGame();
+  const registerBtn = document.getElementById("register-btn");
+  if (activeGame && activeGame.formUrl && resolveStatus(activeGame) === "open") {
+    registerBtn.href = activeGame.formUrl;
+    registerBtn.style.display = "";
+  }
+
   document.getElementById("login-btn").addEventListener("click", doLogin);
   document.getElementById("logout-btn").addEventListener("click", doLogout);
   document.getElementById("email-input").addEventListener("keydown", e => {
