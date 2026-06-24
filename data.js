@@ -63,7 +63,7 @@ const PIX_CONFIG = {
 
 // CSV publicado da aba "Status" (Arquivo → Publicar na web → aba Status → CSV)
 const STATUS_CONFIG_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?gid=362647876&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRkha10-KHnjkLLFFyLS5cDE2S9dsWqbihyEEBeVXNf3Q7LTOFqcXx4Da3qWgkC0gSLm4pyOBfqEaec/pub?gid=1298075309&single=true&output=csv";
 
 // URL do Apps Script publicado como App da Web (termina em /exec) — opcional
 const STATUS_WRITE_URL = "";
@@ -103,7 +103,7 @@ const GAMES = [
     time: "19:00",
     venue: "MetLife Stadium, Nova Jersey",
     espnHome: "Brazil", espnAway: "Morocco",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
-    status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    status: "finished",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: { home: 1, away: 1 },             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoeT2lNWxbabBUhx8sB-oDBnh3f-wkxUucmwp7fSDbOvsL2FHawgY6RVXUCMgNavaqT8wlbSR__4TV/pub?output=csv",
     formUrl: "",
@@ -122,8 +122,8 @@ const GAMES = [
     time: "21:30",
     venue: "Estádio da Filadélfia, Filadélfia",
     espnHome: "Brazil", espnAway: "Haiti",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
-    status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
-    result: null,             // { home: 2, away: 1 } quando terminar
+    status: "finished",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    result: { home: 3, away: 0 },             // { home: 2, away: 1 } quando terminar
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv",
     formUrl: "https://forms.gle/YHQvHJqi6Z9thpR98",
     betDeadline: "2026-06-19T21:29:00",  // horário de Recife
@@ -139,9 +139,9 @@ const GAMES = [
     time: "19:00",
     venue: "Estádio da Miami, Miami Gardens",
     espnHome: "Brazil", espnAway: "Scotland",  // nomes em inglês p/ casar com a API da ESPN (placar ao vivo)
-    status: "upcoming",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
+    status: "open",           // "upcoming" antes do prazo, "open" durante o período de apostas, "closed" após o prazo, "finished" depois do jogo
     result: null,             // { home: 2, away: 1 } quando terminar
-    csvUrl: "",
+    csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRkha10-KHnjkLLFFyLS5cDE2S9dsWqbihyEEBeVXNf3Q7LTOFqcXx4Da3qWgkC0gSLm4pyOBfqEaec/pub?output=csv",
     formUrl: "",
     betDeadline: "2026-06-24T18:59:00",  // horário de Recife
     finishAt: "2026-06-24T19:00:00",     // horário de Recife: vira "finished" às 19h
