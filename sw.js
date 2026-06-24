@@ -10,7 +10,7 @@
 //  (.githooks/pre-commit) a partir do hash do conteúdo do app — não edite à mão.
 // ============================================================
 
-const CACHE_VERSION = "bolao-c01fa1ae";
+const CACHE_VERSION = "bolao-2d583060";
 
 // Arquivos do app que compõem o "shell" (carregados na primeira visita).
 const APP_SHELL = [

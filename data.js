@@ -12,7 +12,7 @@
 // Coluna C (índice 2) = nomes
 // ------------------------------------------------------------------
 const PARTICIPANTS_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQX-yNRzhISzZXr5lWGLfqjj37pCYqSq5KMRArLRrKG04xdjQaBw1EyLXRnDlykvCKiX2LNhjIkA9_O/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRkha10-KHnjkLLFFyLS5cDE2S9dsWqbihyEEBeVXNf3Q7LTOFqcXx4Da3qWgkC0gSLm4pyOBfqEaec/pub?output=csv";
 
 // E-mail do organizador — sempre tem acesso
 const ADMIN_EMAIL = "joaoaraujomn@gmail.com";
